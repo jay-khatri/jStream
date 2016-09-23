@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">jStream</string>
+    <string name="welcome">Below are your options...</string>
+    <string name="imu_stream">IMU Only</string>
+    <string name="cam_stream">Camera Only</string>
+    <string name="both_stream">Both</string>
+    <string name="stop_stream">Stop Stream</string>
+    <string name="status_runnning">Stream is Running</string>
+    <string name="status_stopped">Stream is Stopped</string>
+    <string name="createFile">Create a File</string>
+</resources>
