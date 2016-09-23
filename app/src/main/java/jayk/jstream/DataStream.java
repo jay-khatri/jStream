@@ -21,12 +21,14 @@ import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -45,13 +47,30 @@ import static jayk.jstream.R.attr.title;
 /**
  * An activity to illustrate how to edit contents of a Drive file.
  */
-public class DataStream extends baseDrive{
+public class DataStream extends baseDrive implements SensorEventListener {
 
     private static final String TAG = "EditContentsActivity";
-
+    public SensorManager sensorManager;//used to be called mSensorManager
+    public List<Sensor> sensorList; //NEW
+    private Sensor mAccelerometer, mLinearAcceleration;
 
     @Override
     public void onConnected(Bundle connectionHint) {
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+
+        sensorList = sensorManager.getSensorList(Sensor.TYPE_ALL); //NEW
+
+
+        mAccelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        mLinearAcceleration = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+
+
+        sensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL); //supported
+
+        sensorManager.registerListener(this, mLinearAcceleration, SensorManager.SENSOR_DELAY_NORMAL);
+
+
         super.onConnected(connectionHint);
         String EXISTING_FILE_ID = "0B2CjzfTp5tfjTTB0bU94QndIa1U";
 
@@ -70,7 +89,32 @@ public class DataStream extends baseDrive{
         };
         Drive.DriveApi.fetchDriveId(getGoogleApiClient(), EXISTING_FILE_ID)
                 .setResultCallback(idCallback);
+
+
     }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+
+        String sensorName = event.sensor.getName();
+        String a = String.valueOf(event.values[0]);
+//            String b = String.valueOf(event.values[1]);
+//            String c = String.valueOf(event.values[2]);
+
+//            title.setText(sensorName);
+//            xText.setText(a);
+//            yText.setText(b);
+//            zText.setText(c);
+
+        Log.i(sensorName, a);
+
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor arg0, int arg1) {
+        //nothing happens here
+    }
+
 
     public class EditContentsAsyncTask extends ApiClientAsyncTask<DriveFile, Void, Boolean> {
 
@@ -82,7 +126,7 @@ public class DataStream extends baseDrive{
         protected Boolean doInBackgroundConnected(DriveFile... args) {
             DriveFile file = args[0];
             OutputStream outputStream = null;
-            DataOutputStream dos= null;
+            DataOutputStream dos = null;
             BufferedOutputStream bos = null;
             try {
                 DriveApi.DriveContentsResult driveContentsResult = file.open(
@@ -95,7 +139,7 @@ public class DataStream extends baseDrive{
                 bos = new BufferedOutputStream(outputStream);
                 dos = new DataOutputStream(bos);
                 String nl = System.getProperty("line.separator");
-                for(int x = 0; x<5; x = x+1){
+                for (int x = 0; x < 5; x = x + 1) {
                     dos.writeBytes("Hello");
                     dos.writeBytes(nl);
                 }
@@ -106,11 +150,11 @@ public class DataStream extends baseDrive{
             } catch (IOException e) {
                 Log.e(TAG, "IOException while appending to the output stream", e);
             } finally {
-                try {dos.close();
+                try {
+                    dos.close();
                     bos.close();
                     outputStream.close();
-                }
-                catch(Exception e) {
+                } catch (Exception e) {
                 }
 
             }
@@ -126,51 +170,8 @@ public class DataStream extends baseDrive{
             showMessage("Successfully edited contents");
         }
 
-//        @Override
-//        public void onSensorChanged(SensorEvent event) {
-//
-//
-//            String sensorName = event.sensor.getName();
-//            // int sensorType = event.sensor.getType();
 
-//        String gravity = "gravity";
-//        String accel = "linear";
+    }
 
 
-//        if (sensorType == Sensor.TYPE_GYROSCOPE_UNCALIBRATED) {
-
-//            String a = String.valueOf(event.values[0]);
-//            String b = String.valueOf(event.values[1]);
-//            String c = String.valueOf(event.values[2]);
-//
-//            title.setText(sensorName);
-//            xText.setText(a);
-//            yText.setText(b);
-//            zText.setText(c);
-//
-//            Log.i(sensorName, a);
-
-//            }
-//        if (sensorType == Sensor.TYPE_GYROSCOPE) {
-//
-//                String a1 = String.valueOf(event.values[0]);
-//                String b1 = String.valueOf(event.values[1]);
-//                String c1 = String.valueOf(event.values[2]);
-//
-//                title1.setText(sensorName);
-//                xText1.setText(a1);
-//                yText1.setText(b1);
-//                zText1.setText(c1);
-//                String Tag2 = "222222: ";
-//                Log.i(Tag2, a1);
-//
-//        }
-
-        }
-
-//        @Override
-//        public void onAccuracyChanged(Sensor arg0, int arg1) {
-//            //nothing happens here
-        }
-
-
+}
