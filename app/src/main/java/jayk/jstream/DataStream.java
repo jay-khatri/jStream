@@ -53,6 +53,8 @@ public class DataStream extends baseDrive implements SensorEventListener {
     public SensorManager sensorManager;//used to be called mSensorManager
     public List<Sensor> sensorList; //NEW
     private Sensor mAccelerometer, mLinearAcceleration;
+    public boolean connect;
+    String globalSense;
 
     @Override
     public void onConnected(Bundle connectionHint) {
@@ -97,7 +99,7 @@ public class DataStream extends baseDrive implements SensorEventListener {
     public void onSensorChanged(SensorEvent event) {
 
         String sensorName = event.sensor.getName();
-        String a = String.valueOf(event.values[0]);
+        globalSense = String.valueOf(event.values[0]);
 //            String b = String.valueOf(event.values[1]);
 //            String c = String.valueOf(event.values[2]);
 
@@ -106,7 +108,7 @@ public class DataStream extends baseDrive implements SensorEventListener {
 //            yText.setText(b);
 //            zText.setText(c);
 
-        Log.i(sensorName, a);
+        Log.i(sensorName, globalSense);
 
     }
 
